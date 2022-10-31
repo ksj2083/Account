@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
+import org.springframework.stereotype.Service;
+
 import com.example.account.domain.Account;
 import com.example.account.domain.AccountUser;
 import com.example.account.dto.AccountDto;
@@ -14,12 +18,8 @@ import com.example.account.exception.AccountException;
 import com.example.account.repository.AccountRepository;
 import com.example.account.repository.AccountUserRepository;
 import com.example.account.type.AccountStatus;
-import com.example.account.type.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +34,7 @@ public class AccountService {
      */
     @Transactional
     public AccountDto createAccount(Long userId, Long initialBalance) {
-        AccountUser accountUser = accountUserRepository.findById(userId)
-            .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
+        AccountUser accountUser = getAccountUser(userId);
         validateCreateAccount(accountUser);
 
         String newAccountNumber = accountRepository.findFirstByOrderByIdDesc()
@@ -55,6 +54,12 @@ public class AccountService {
         );
     }
 
+    private AccountUser getAccountUser(Long userId) {
+        AccountUser accountUser = accountUserRepository.findById(userId)
+            .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
+        return accountUser;
+    }
+
     private void validateCreateAccount(AccountUser accountUser) {
         if(accountRepository.countByAccountUser(accountUser) >= 10) {
             throw new AccountException(MAX_ACCOUNT_PER_USER_10);
@@ -71,8 +76,7 @@ public class AccountService {
 
     @Transactional
     public AccountDto deleteAccount(Long userId, String accountNumber) {
-        AccountUser accountUser = accountUserRepository.findById(userId)
-            .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
+        AccountUser accountUser = getAccountUser(userId);
         Account account = accountRepository.findByAccountNumber(accountNumber)
             .orElseThrow(() -> new AccountException(ACCOUNT_NOT_FOUND));
 
@@ -104,8 +108,7 @@ public class AccountService {
 
     @Transactional
     public List<AccountDto> getAccountsByUserId(Long userId) {
-        AccountUser accountUser = accountUserRepository.findById(userId)
-            .orElseThrow(() -> new AccountException(USER_NOT_FOUND));
+        AccountUser accountUser = getAccountUser(userId);
 
         List<Account> accounts = accountRepository.findByAccountUser(accountUser);
 
