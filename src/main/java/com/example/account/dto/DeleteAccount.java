@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 public class DeleteAccount {
-
 	@Getter
 	@Setter
 	@AllArgsConstructor
+	@NoArgsConstructor
 	public static class Request {
 		//컨트롤러에서 어떻게 Valid 하는지 정해준다
 		@NotNull
@@ -26,7 +26,6 @@ public class DeleteAccount {
 
 		@NotBlank
 		@Size(min = 10, max = 10)
-		@Min(100)
 		private String accountNumber;
 	}
 

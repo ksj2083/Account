@@ -1,9 +1,13 @@
 package com.example.account.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.validation.Valid;
 
 import com.example.account.domain.Account;
 import com.example.account.dto.AccountDto;
+import com.example.account.dto.AccountInfo;
 import com.example.account.dto.DeleteAccount;
 import com.example.account.service.AccountService;
 import com.example.account.service.RedisTestService;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -43,6 +48,19 @@ public class AccountController {
             request.getUserId(),
             request.getAccountNumber()
         ));
+    }
+
+    @GetMapping("/account")
+    public List<AccountInfo> getAccountsByUserId(
+        @RequestParam("user_id") Long userId
+    ){
+        return accountService.getAccountsByUserId(userId)
+            .stream().map(accountDto ->
+                AccountInfo.builder()
+                .accountNumber(accountDto.getAccountNumber())
+                .balance(accountDto.getBalance())
+                .build())
+            .collect(Collectors.toList());
     }
 
     @GetMapping("/get-lock")

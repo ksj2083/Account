@@ -16,6 +16,7 @@ public class CreateAccount {
 	@Getter
 	@Setter
 	@AllArgsConstructor
+	@NoArgsConstructor
 	public static class Request {
 		//컨트롤러에서 어떻게 Valid 하는지 정해준다
 		@NotNull
@@ -23,7 +24,7 @@ public class CreateAccount {
 		private Long userId;
 
 		@NotNull
-		@Min(100)
+		@Min(0)
 		private Long initialBalance;
 	}
 
